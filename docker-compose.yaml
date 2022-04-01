@@ -1,0 +1,26 @@
+version: '3.9'
+services:
+  patient-postgres:
+    image: postgres:14.2
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-test}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-test}
+      POSTGRES_DB: "patient"
+
+  patient-service:
+    depends_on:
+      - patient-postgres
+    build:
+      context: .
+      dockerfile: Patient-Service/Dockerfile
+    ports:
+      - "5051:80"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Staging
+
+networks:
+  default:
+    external:
+      name: swsp
