@@ -9,7 +9,7 @@ namespace Patient_Service.Controllers;
 
 [ApiController]
 [Produces(MediaTypeNames.Application.Json)]
-[Route("[controller]")]
+[Route("patients")]
 public class PatientController : ControllerBase
 {
     private readonly IPatientService _patientService;
@@ -26,7 +26,7 @@ public class PatientController : ControllerBase
         _mapper = mapper;
     }
     
-    [HttpGet("patients")]
+    [HttpGet]
     public IEnumerable<PatientDTO> GetPatients()
     {
         var patients = _patientService.GetAll();
@@ -35,7 +35,7 @@ public class PatientController : ControllerBase
     }
     
 
-    [HttpGet("patients/{id}")]
+    [HttpGet("{id}")]
     public PatientDTO GetPatient(string id)
     {
         var patient = _patientService.GetPatient(id);
@@ -43,7 +43,7 @@ public class PatientController : ControllerBase
         return _mapper.Map<PatientDTO>(patient);
     }
     
-    [HttpPost("patients")]
+    [HttpPost]
     public PatientDTO PostPatient(CreatePatientDTO patient)
     {
         var patientData = _patientService.CreatePatient(patient.FirstName, patient.LastName, patient.Birthdate);

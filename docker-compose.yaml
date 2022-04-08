@@ -8,10 +8,23 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-test}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-test}
       POSTGRES_DB: "patient"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-test} -d patient"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   patient-service:
     depends_on:
-      - patient-postgres
+      patient-postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+
     build:
       context: .
       dockerfile: Patient-Service/Dockerfile
@@ -22,5 +35,4 @@ services:
 
 networks:
   default:
-    external:
-      name: swsp
+    name: swsp
