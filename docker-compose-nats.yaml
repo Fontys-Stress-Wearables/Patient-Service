@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  nats:
+    image: nats:2.7.4
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+      - "6222:6222"
+
+networks:
+  default:
+    name: swsp

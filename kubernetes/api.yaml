@@ -1,0 +1,86 @@
+# deployment
+#
+# set up a deployment for the patient API.
+# for the prototype we can pull the image from the local image registry
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: patient-service
+spec:
+ selector:
+  matchLabels:
+   app: patient-service
+ replicas: 1
+ template:
+  metadata:
+   labels:
+    app: patient-service
+  spec:
+   containers:
+    - name: patient-service
+      image: localhost:5000/patient-service:latest
+
+
+---
+# service
+
+apiVersion: v1
+kind: Service
+metadata:
+ name: patient-service
+spec:
+ selector:
+  app: patient-service
+ ports:
+  - port: 80 # Default port for image
+    targetPort: 80 # Default port for image
+
+---
+# replacePathRegex middleware
+#
+# strips the first part of the request path and rewrites it to match the backend URL
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: patient-service-path-middleware
+spec:
+  replacePathRegex:
+    regex: ^/api/patients
+    replacement: /patients
+
+---
+# custom header middleware
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: patient-service-header-middleware
+spec:
+  headers:
+    customRequestHeaders:
+      X-Forwarded-For: "/api/patients"
+
+---
+# ingress
+#
+# Sets up an ingress to route traffic to the patient service
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: patient-service
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: default-patient-service-path-middleware@kubernetescrd, default-patient-service-header-middleware@kubernetescrd
+spec:
+  rules:
+  - http:
+      paths:
+        - path: /api/patients
+          pathType: Prefix
+          backend:
+            service:
+              name: patient-service
+              port:
+                number: 80
