@@ -7,4 +7,5 @@ public class Patient
     public string LastName { get; set; } = "";
     public DateTime Birthdate { get; set; }
     public bool IsActive { get; set; }
+    public string Tenant { get; set; } = "";
 }
