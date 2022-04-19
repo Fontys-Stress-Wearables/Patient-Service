@@ -19,9 +19,8 @@ jobs:
           dotnet-version: '6.0.x'
         
       - name: Unit tests
-        run: | 
-          cd tests
-          dotnet test --no-restore --verbosity normal
+        working-directory: ./tests
+        run: dotnet test --no-restore --verbosity normal
       
       - name: Formatting
         continue-on-error: true
