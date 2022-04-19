@@ -17,16 +17,14 @@ namespace Patient_Service.Controllers;
 public class PatientController : ControllerBase
 {
     private readonly IPatientService _patientService;
-    private readonly INatsService _natsService;
     private readonly IMapper _mapper;
 
     public PatientController
     (
-        IPatientService patientService, INatsService natsService, IMapper mapper
+        IPatientService patientService, IMapper mapper
     )
     {
         _patientService = patientService;
-        _natsService = natsService;
         _mapper = mapper;
     }
     

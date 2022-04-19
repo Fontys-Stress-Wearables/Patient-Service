@@ -7,10 +7,12 @@ namespace Patient_Service.Services;
 public class PatientService : IPatientService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly INatsService _natsService;
 
-    public PatientService(IUnitOfWork unitOfWork)
+    public PatientService(IUnitOfWork unitOfWork, INatsService natsService)
     {
         _unitOfWork = unitOfWork;
+        _natsService = natsService;
     }
 
     public Patient CreatePatient(string tenantId, string firstName, string lastName, DateTime birthdate)
@@ -41,6 +43,8 @@ public class PatientService : IPatientService
         };
 
         _unitOfWork.Patients.Add(patient);
+        _natsService.Publish("patient-created", patient);
+            
         _unitOfWork.Complete();
 
         return patient;
@@ -72,6 +76,8 @@ public class PatientService : IPatientService
         patient.Birthdate = birthdate ?? patient.Birthdate;
 
         _unitOfWork.Patients.UpdatePatient(patient);
+        _natsService.Publish("patient-updated", patient);
+        
         _unitOfWork.Complete();
         
         return patient;
