@@ -34,13 +34,21 @@ public class NatsService : INatsService
         _connection?.Publish(target, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)));
     }
 
-    public void Subscribe(string target, EventHandler<MsgHandlerEventArgs> handler)
+    public void Subscribe<T>(string target, Action<NatsMessage<T>> handler)
     {
         _asyncSubscription = _connection?.SubscribeAsync(target);
-        if (_asyncSubscription != null)
+        
+        if (_asyncSubscription == null) return;
+        
+        _asyncSubscription.MessageHandler += (_, args) =>
         {
-            _asyncSubscription.MessageHandler += handler;
-            _asyncSubscription.Start();
-        }
+            var jsonString = Encoding.UTF8.GetString(args.Message.Data);
+            var msg = JsonConvert.DeserializeObject<NatsMessage<T>>(jsonString);
+            
+            if (msg == null) return;
+            
+            handler(msg);
+        };
+        _asyncSubscription.Start();
     }
 }

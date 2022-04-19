@@ -16,22 +16,27 @@ namespace Patient_Service.Controllers;
 public class PatientController : ControllerBase
 {
     private readonly IPatientService _patientService;
+    private readonly IOrganizationService _organizationService;
     private readonly IMapper _mapper;
 
     public PatientController
     (
-        IPatientService patientService, IMapper mapper)
+        IPatientService patientService, IMapper mapper, IOrganizationService organizationService)
     {
         _patientService = patientService;
         _mapper = mapper;
+        _organizationService = organizationService;
     }
     
     [HttpGet]
     public IEnumerable<PatientDTO> GetPatients()
     {
         var tenantId = HttpContext.User.GetTenantId();
+
+        if (tenantId == null || !_organizationService.Exists(tenantId))
+            throw new MissingTenantException("Tenant not found");
         
-        var patients = _patientService.GetAll(tenantId ?? throw new MissingTenantException("Could not get tenant from user"));
+        var patients = _patientService.GetAll(tenantId);
 
         return _mapper.Map<IEnumerable<PatientDTO>>(patients);
     }
@@ -42,7 +47,10 @@ public class PatientController : ControllerBase
     {
         var tenantId = HttpContext.User.GetTenantId();
         
-        var patient = _patientService.GetPatient(tenantId ?? throw new MissingTenantException("Could not get tenant from user"), id);
+        if (tenantId == null || !_organizationService.Exists(tenantId))
+            throw new MissingTenantException("Tenant not found");
+        
+        var patient = _patientService.GetPatient(tenantId, id);
 
         return _mapper.Map<PatientDTO>(patient);
     }
@@ -51,8 +59,11 @@ public class PatientController : ControllerBase
     public PatientDTO PostPatient(CreatePatientDTO patient)
     {
         var tenantId = HttpContext.User.GetTenantId();
+        
+        if (tenantId == null || !_organizationService.Exists(tenantId))
+            throw new MissingTenantException("Tenant not found");
 
-        var patientData = _patientService.CreatePatient(tenantId ?? throw new MissingTenantException("Could not get tenant from user"), patient.FirstName, patient.LastName, patient.Birthdate);
+        var patientData = _patientService.CreatePatient(tenantId, patient.FirstName, patient.LastName, patient.Birthdate);
 
         return _mapper.Map<PatientDTO>(patientData);
     }
@@ -61,8 +72,11 @@ public class PatientController : ControllerBase
     public PatientDTO UpdatePatient(string id, UpdatePatientDto patient)
     {
         var tenantId = HttpContext.User.GetTenantId();
+        
+        if (tenantId == null || !_organizationService.Exists(tenantId))
+            throw new MissingTenantException("Tenant not found");
 
-        var patientData = _patientService.UpdatePatient(tenantId ?? throw new MissingTenantException("Could not get tenant from user"), id, patient.FirstName, patient.LastName, patient.Birthdate);
+        var patientData = _patientService.UpdatePatient(tenantId, id, patient.FirstName, patient.LastName, patient.Birthdate);
 
         return _mapper.Map<PatientDTO>(patientData);
     }
