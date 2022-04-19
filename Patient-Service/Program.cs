@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using Patient_Service.Data;
 using Patient_Service.Interfaces;
 using Patient_Service.Middlewares;
+using Patient_Service.Models;
 using Patient_Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +29,8 @@ builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<IPatientService, PatientService>();
 
 builder.Services.AddSingleton<INatsService, NatsService>();
+
+builder.Services.AddSingleton<IOrganizationService, OrganizationService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(setup =>

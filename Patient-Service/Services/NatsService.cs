@@ -10,6 +10,7 @@ public class NatsService : INatsService
 {
     private readonly IConfiguration _configuration;
     private readonly IConnection? _connection;
+    private IAsyncSubscription? _asyncSubscription;
 
     public NatsService(IConfiguration configuration)
     {
@@ -31,5 +32,15 @@ public class NatsService : INatsService
     {
         var message = new NatsMessage<T>{target = target, message = data};
         _connection?.Publish(target, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)));
+    }
+
+    public void Subscribe(string target, EventHandler<MsgHandlerEventArgs> handler)
+    {
+        _asyncSubscription = _connection?.SubscribeAsync(target);
+        if (_asyncSubscription != null)
+        {
+            _asyncSubscription.MessageHandler += handler;
+            _asyncSubscription.Start();
+        }
     }
 }

@@ -6,4 +6,5 @@ public interface INatsService
 {
     public IConnection Connect();
     public void Publish<T>(string topic, T data);
+    public void Subscribe(string target, EventHandler<MsgHandlerEventArgs> handler);
 }

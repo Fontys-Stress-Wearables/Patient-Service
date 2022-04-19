@@ -2,7 +2,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Identity.Web;
 using Patient_Service.Dtos;
 using Patient_Service.Exceptions;
