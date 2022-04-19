@@ -7,13 +7,15 @@ namespace Patient_Service.Services;
 public class PatientService : IPatientService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly INatsService _natsService;
 
-    public PatientService(IUnitOfWork unitOfWork)
+    public PatientService(IUnitOfWork unitOfWork, INatsService natsService)
     {
         _unitOfWork = unitOfWork;
+        _natsService = natsService;
     }
 
-    public Patient CreatePatient(string firstName, string lastName, DateTime birthdate)
+    public Patient CreatePatient(string tenantId, string firstName, string lastName, DateTime birthdate)
     {
         if (string.IsNullOrWhiteSpace(firstName))
         {
@@ -32,6 +34,7 @@ public class PatientService : IPatientService
 
         var patient = new Patient()
         {
+            Tenant = tenantId,
             FirstName = firstName,
             LastName = lastName,
             Birthdate = birthdate,
@@ -40,25 +43,43 @@ public class PatientService : IPatientService
         };
 
         _unitOfWork.Patients.Add(patient);
+        _natsService.Publish("patient-created", patient);
+            
         _unitOfWork.Complete();
 
         return patient;
     }
 
-    public IEnumerable<Patient> GetAll()
+    public IEnumerable<Patient> GetAll(string tenant)
     {
-        return _unitOfWork.Patients.GetAll();
+        return _unitOfWork.Patients.GetAllByTenant(tenant);
     }
 
-    public Patient GetPatient(string id)
+    public Patient GetPatient(string tenantId, string id)
     {
-        var patient = _unitOfWork.Patients.GetById(id);
+        var patient = _unitOfWork.Patients.GetByIdAndTenant(tenantId,id);
 
         if (patient == null)
         {
             throw new NotFoundException($"Patient with id '{id}' doesn't exist.");
         }
 
+        return patient;
+    }
+
+    public Patient UpdatePatient(string tenantId, string patientId, string? firstName, string? lastName, DateTime? birthdate)
+    {
+        var patient = GetPatient(tenantId, patientId);
+
+        patient.FirstName = firstName ?? patient.FirstName;
+        patient.LastName = lastName ?? patient.LastName;
+        patient.Birthdate = birthdate ?? patient.Birthdate;
+
+        _unitOfWork.Patients.UpdatePatient(patient);
+        _natsService.Publish("patient-updated", patient);
+        
+        _unitOfWork.Complete();
+        
         return patient;
     }
 }
