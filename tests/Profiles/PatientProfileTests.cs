@@ -10,6 +10,6 @@ public class PatientProfileTests {
         //Act
         
         //Assert
-        Assert.Equal(1, 1);
+        Assert.Equal(1, 2);
     }
 }
