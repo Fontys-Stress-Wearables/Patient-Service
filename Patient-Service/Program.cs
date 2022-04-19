@@ -79,6 +79,7 @@ if(!app.Environment.IsDevelopment())
     app.UseMiddleware<ErrorMiddleware>();
 }
 
+app.UseOrganizationAuthorization();
 
 using (var scope = app.Services.CreateScope())
 {

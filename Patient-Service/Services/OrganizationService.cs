@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using NATS.Client;
 using Newtonsoft.Json;
+using Patient_Service.Exceptions;
 using Patient_Service.Interfaces;
 using Patient_Service.Models;
 
@@ -15,6 +16,11 @@ public class OrganizationService : IOrganizationService
         _unitOfWork = unitOfWork;
 
         natsService.Subscribe("organization-created", OrganizationCreated);
+    }
+    
+    public bool Exists(string id)
+    {
+        return _unitOfWork.Organizations.GetById(id) != null;
     }
 
     private void OrganizationCreated(object? sender, MsgHandlerEventArgs e)

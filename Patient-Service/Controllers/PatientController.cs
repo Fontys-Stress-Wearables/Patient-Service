@@ -20,8 +20,7 @@ public class PatientController : ControllerBase
 
     public PatientController
     (
-        IPatientService patientService, IMapper mapper
-    )
+        IPatientService patientService, IMapper mapper)
     {
         _patientService = patientService;
         _mapper = mapper;
