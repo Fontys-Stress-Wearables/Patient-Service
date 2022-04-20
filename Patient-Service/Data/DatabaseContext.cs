@@ -10,10 +10,12 @@ public class DatabaseContext : DbContext
     }
     
     public DbSet<Patient> Patients { get; set; }
+    public DbSet<Organization> Organizations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Patient>().ToTable("Patient");
+        modelBuilder.Entity<Organization>().ToTable("Organization");
     }
 
 }
