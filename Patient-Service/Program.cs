@@ -75,10 +75,10 @@ if (!app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
-// if(!app.Environment.IsDevelopment())
-// {
+if(!app.Environment.IsDevelopment())
+{
     app.UseErrorMiddleware();
-// }
+}
 
 using (var scope = app.Services.CreateScope())
 {

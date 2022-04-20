@@ -2,10 +2,13 @@
 
 namespace Patient_Service.Services;
 
-public class HeartBeatService : BackgroundService
+public class HeartBeatService : IHostedService, IDisposable
 {
     private readonly INatsService _natsService;
 
+    private Timer _timer;
+    private readonly TimeSpan _heartBeatInterval = TimeSpan.FromSeconds(30);
+    
     public HeartBeatService(INatsService natsService)
     {
         _natsService = natsService;
@@ -16,9 +19,21 @@ public class HeartBeatService : BackgroundService
         _natsService.Publish("technical_health", "heartbeat");
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        var timer = new Timer(HeartbeatTimerCallback, null, 1000, 30000);
+        _timer = new Timer(HeartbeatTimerCallback, null, TimeSpan.Zero, _heartBeatInterval);
         return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken stoppingToken)
+    {
+        _timer.Change(Timeout.Infinite, 0);
+
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        _timer.Dispose();
     }
 }
