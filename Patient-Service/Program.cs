@@ -31,6 +31,7 @@ builder.Services.AddTransient<IOrganizationService, OrganizationService>();
 builder.Services.AddSingleton<INatsService, NatsService>();
 
 builder.Services.AddHostedService<NatsSubscriptionService>();
+builder.Services.AddHostedService<HeartBeatService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(setup =>
@@ -76,7 +77,7 @@ if (!app.Environment.IsProduction())
 
 if(!app.Environment.IsDevelopment())
 {
-    app.UseMiddleware<ErrorMiddleware>();
+    app.UseErrorMiddleware();
 }
 
 using (var scope = app.Services.CreateScope())
