@@ -20,7 +20,7 @@ jobs:
         
       - name: Unit tests
         working-directory: ./tests
-        run: dotnet test --no-restore --verbosity normal
+        run: dotnet test
       
       - name: Formatting
         continue-on-error: true
