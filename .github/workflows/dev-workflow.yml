@@ -20,7 +20,7 @@ jobs:
         
       - name: Unit tests
         # Make sure that all the tests are in the 'tests' folder in the root
-        working-directory: ./tests
+        working-directory: ./Patient-Service-Tests
         run: dotnet test
       
       - name: Formatting
