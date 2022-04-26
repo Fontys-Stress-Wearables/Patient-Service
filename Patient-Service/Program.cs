@@ -26,8 +26,12 @@ builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericReposi
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddTransient<IPatientService, PatientService>();
+builder.Services.AddTransient<IOrganizationService, OrganizationService>();
 
 builder.Services.AddSingleton<INatsService, NatsService>();
+
+builder.Services.AddHostedService<NatsSubscriptionService>();
+builder.Services.AddHostedService<HeartBeatService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(setup =>
@@ -73,9 +77,8 @@ if (!app.Environment.IsProduction())
 
 if(!app.Environment.IsDevelopment())
 {
-    app.UseMiddleware<ErrorMiddleware>();
+    app.UseErrorMiddleware();
 }
-
 
 using (var scope = app.Services.CreateScope())
 {
@@ -91,6 +94,8 @@ app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseOrganizationAuthorizationMiddleware();
 
 app.MapControllers();
 

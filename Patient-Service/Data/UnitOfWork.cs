@@ -10,8 +10,10 @@ public class UnitOfWork : IUnitOfWork
     {
         _context = context;
         Patients = new PatientRepository(_context);
+        Organizations = new OrganizationRepository(_context);
     }
 
+    public IOrganizationRepository Organizations { get; }
     public IPatientRepository Patients { get; }
     
     public void Dispose()
