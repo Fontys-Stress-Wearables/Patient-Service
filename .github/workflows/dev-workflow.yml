@@ -7,7 +7,6 @@ on:
 
 env: 
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   unit-tests-and-lint:
@@ -18,10 +17,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           dotnet-version: '6.0.x'
-
+        
       - name: Unit tests
-        run: dotnet test --no-restore --verbosity normal
-
+        # Make sure that all the tests are in the 'tests' folder in the root
+        working-directory: ./Patient-Service-Tests
+        run: dotnet test
+      
       - name: Formatting
         continue-on-error: true
         run: dotnet format --verify-no-changes
