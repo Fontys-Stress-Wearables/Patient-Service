@@ -58,4 +58,12 @@ public class PatientController : ControllerBase
 
         return _mapper.Map<PatientDTO>(patientData);
     }
+    
+    [HttpPut("{id}/profileImage")]
+    public PatientDTO AddProfileImagePatient(string id, [FromForm] IFormFile image)
+    {
+        var patientData = _patientService.AddProfileImagePatient(HttpContext.User.GetTenantId()!, id, image);
+
+        return _mapper.Map<PatientDTO>(patientData);
+    }
 }

@@ -8,11 +8,13 @@ public class PatientService : IPatientService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly INatsService _natsService;
+    private readonly IBlobStorageService _blobStorageService;
 
-    public PatientService(IUnitOfWork unitOfWork, INatsService natsService)
+    public PatientService(IUnitOfWork unitOfWork, INatsService natsService, IBlobStorageService blobStorageService)
     {
         _unitOfWork = unitOfWork;
         _natsService = natsService;
+        _blobStorageService = blobStorageService;
     }
 
     public Patient CreatePatient(string tenantId, string firstName, string lastName, DateTime birthdate)
@@ -80,6 +82,26 @@ public class PatientService : IPatientService
         
         _unitOfWork.Complete();
         
+        return patient;
+    }
+
+    public async Task<Patient> AddProfileImagePatient(string tenantId, string patientId, IFormFile image)
+    {
+        var patient = _unitOfWork.Patients.GetByIdAndTenant(tenantId,patientId);
+        
+        if (patient == null)
+        {
+            throw new NotFoundException($"Patient with id '{patientId}' doesn't exist.");
+        }
+        
+        var imageBlobUrl = await _blobStorageService.UploadProfileImage_GetImageUrl(image);
+        
+        patient.ProfileImageUrl = imageBlobUrl;
+        _unitOfWork.Patients.UpdatePatient(patient);
+        _natsService.Publish("patient-updated", patient);
+
+        _unitOfWork.Complete();
+
         return patient;
     }
 }

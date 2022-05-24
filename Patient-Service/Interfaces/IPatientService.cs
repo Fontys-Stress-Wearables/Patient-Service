@@ -12,4 +12,6 @@ public interface IPatientService
 
     public Patient UpdatePatient(string tenantId, string patientId, string? firstName, string? lastName,
         DateTime? birthdate);
+
+    public Task<Patient> AddProfileImagePatient(string tenantId, string patientId, IFormFile image);
 }
