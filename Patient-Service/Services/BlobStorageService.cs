@@ -11,8 +11,8 @@ public class BlobStorageService : IBlobStorageService
     public BlobStorageService(IConfiguration configuration)
     {
         _configuration = configuration;
-        _blobContainerClient = new BlobContainerClient(_configuration["blogStorageConnectionString"],
-            _configuration["blobImageContainerName"]);
+        _blobContainerClient = new BlobContainerClient(_configuration.GetConnectionString("blogStorageConnectionString"),
+            _configuration.GetConnectionString("blobImageContainerName"));
 
     }
 
