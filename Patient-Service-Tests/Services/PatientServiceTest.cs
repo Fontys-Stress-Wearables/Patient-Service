@@ -13,6 +13,7 @@ public class PatientServiceTest
     
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
     private readonly Mock<INatsService> _natsServiceMock = new();
+    private readonly Mock<IBlobStorageService> _blobStorage = new();
 
     public PatientServiceTest()
     {
@@ -29,7 +30,7 @@ public class PatientServiceTest
     public void CreatePatient_ShouldSucceed()
     {
         //Arrange
-        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object);
+        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
         //Act
         var patient = patientService.CreatePatient("id", "John", "Doe", Convert.ToDateTime("Oct 21, 2015"));
         //Assert
@@ -42,7 +43,7 @@ public class PatientServiceTest
     public void CreatePatientWithoutFirstName_ShouldFail()
     {
         //Arrange
-        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object);
+        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
         //Act
         var exception = Assert.Throws<BadRequestException>(() => 
             patientService.CreatePatient("id", "", "Doe", Convert.ToDateTime("Oct 21, 2015"))
@@ -55,7 +56,7 @@ public class PatientServiceTest
     public void CreatePatientWithoutLastName_ShouldFail()
     {
         //Arrange
-        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object);
+        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
         //Act
         var exception = Assert.Throws<BadRequestException>(() => 
             patientService.CreatePatient("id", "John", "", Convert.ToDateTime("Oct 21, 2015"))
@@ -68,7 +69,7 @@ public class PatientServiceTest
     public void CreatePatientWithDateGreaterThanCurrent_ShouldFail()
     {
         //Arrange
-        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object);
+        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
         //Act
         var exception = Assert.Throws<BadRequestException>(() => 
             patientService.CreatePatient("id", "John", "Doe", Convert.ToDateTime("Dec 12, 9999"))
@@ -81,7 +82,7 @@ public class PatientServiceTest
     public void GetPatient_ShouldFail()
     {
         //Arrange
-        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object);
+        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
         //Act
         var exception = Assert.Throws<NotFoundException>(() => 
             patientService.GetPatient("id", "id")

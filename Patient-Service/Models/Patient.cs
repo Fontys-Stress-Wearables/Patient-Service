@@ -8,4 +8,6 @@ public class Patient
     public DateTime Birthdate { get; set; }
     public bool IsActive { get; set; }
     public string Tenant { get; set; } = "";
+    public string? ProfileImageUrl { get; set; } = "";
+    public string? ProfileImageName { get; set; } = "";
 }

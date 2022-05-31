@@ -16,7 +16,7 @@ public class PatientRepository : GenericRepository<Patient>, IPatientRepository
 
     public Patient GetByIdAndTenant(string tenantId, string patientId)
     {
-        return _context.Set<Patient>().Where(x => x.Tenant == tenantId).First(x => x.Id == patientId);
+        return _context.Set<Patient>().Where(x => x.Tenant == tenantId).FirstOrDefault(x => x.Id == patientId);
     }
 
     public Patient UpdatePatient(Patient patient)

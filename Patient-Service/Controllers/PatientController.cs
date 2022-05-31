@@ -58,4 +58,26 @@ public class PatientController : ControllerBase
 
         return _mapper.Map<PatientDTO>(patientData);
     }
+    
+    [HttpPost("{id}/profile-image")]
+    public async Task<PatientDTO> AddProfileImagePatient(string id, [FromForm] IFormFile image)
+    {
+        var patientData = await _patientService.AddProfileImagePatient(HttpContext.User.GetTenantId()!, id, image);
+
+        return _mapper.Map<PatientDTO>(patientData);
+    }
+    
+    [HttpDelete("{id}/profile-image")]
+    public void RemoveProfileImagePatient(string id)
+    {
+        _patientService.RemoveProfileImagePatient(HttpContext.User.GetTenantId()!, id);
+    }
+    
+    [HttpPut("{id}/profile-image")]
+    public async Task<PatientDTO> UpdateProfileImagePatient(string id, [FromForm] IFormFile image)
+    {
+        var patientData = await _patientService.UpdateProfileImagePatient(HttpContext.User.GetTenantId()!, id, image);
+
+        return _mapper.Map<PatientDTO>(patientData);
+    }
 }

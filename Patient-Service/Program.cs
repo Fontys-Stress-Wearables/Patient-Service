@@ -27,6 +27,7 @@ builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddTransient<IPatientService, PatientService>();
 builder.Services.AddTransient<IOrganizationService, OrganizationService>();
+builder.Services.AddTransient<IBlobStorageService, BlobStorageService>();
 
 builder.Services.AddSingleton<INatsService, NatsService>();
 
