@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using Patient_Service.Exceptions;
 using Patient_Service.Interfaces;
@@ -19,10 +21,8 @@ public class PatientServiceTest
     {
         var patient = new Patient();
         
-        _unitOfWorkMock.Setup(x => x.Patients.Add(patient)).Returns(patient);
+        _unitOfWorkMock.Setup(x => x.Patients.Add(patient)).Returns(() => null);
         _unitOfWorkMock.Setup(x => x.Complete()).Returns(0);
-        _unitOfWorkMock.Setup(x => x.Patients.GetByIdAndTenant("tenant", "patient")).Returns(() => null);
-
         _natsServiceMock.Setup(x => x.Publish("", patient));
     }
 
@@ -34,6 +34,7 @@ public class PatientServiceTest
         //Act
         var patient = patientService.CreatePatient("id", "John", "Doe", Convert.ToDateTime("Oct 21, 2015"));
         //Assert
+        _unitOfWorkMock.Verify(x => x.Complete(), Times.Once);
         Assert.Equal(patient.FirstName, "John");
         Assert.Equal(patient.LastName, "Doe");
         Assert.Equal(patient.Birthdate, Convert.ToDateTime("Oct 21, 2015"));
@@ -77,12 +78,47 @@ public class PatientServiceTest
         //Assert
         Assert.Equal("Birthdate cannot be after the current date.", exception.Message);
     }
+    
+    [Fact]
+    public void GetAll_ShouldSucceed()
+    {
+        //Arrange
+        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
+        var patientList = new List<Patient>()
+        {
+            new Patient() { Id = "patientId1"},
+            new Patient() { Id = "patientId2"}
+        };
+        _unitOfWorkMock.Setup(x => x.Patients.GetAllByTenant("")).Returns(patientList);
+        //Act
+        var result = patientService.GetAll("");
+        //Assert
+        _unitOfWorkMock.Verify(x => x.Patients.GetAllByTenant(""));
+        Assert.NotNull(result);
+        Assert.Equal(patientList.Count, result.Count());
+    }
+
+    [Fact]
+    public void GetPatient_ShouldSucceed()
+    {
+        //Arrange
+        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
+        var patient = new Patient() { Id = "patientId"};
+        _unitOfWorkMock.Setup(x => x.Patients.GetByIdAndTenant("", patient.Id)).Returns(patient);
+        //Act
+        var result = patientService.GetPatient("", patient.Id);
+        //Assert
+        _unitOfWorkMock.Verify(x => x.Patients.GetByIdAndTenant("", patient.Id));
+        Assert.NotNull(result);
+        Assert.Equal(patient.Id, result.Id);
+    }
 
     [Fact]
     public void GetPatient_ShouldFail()
     {
         //Arrange
         IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
+        _unitOfWorkMock.Setup(x => x.Patients.GetByIdAndTenant("id", "id")).Returns(() => null);
         //Act
         var exception = Assert.Throws<NotFoundException>(() => 
             patientService.GetPatient("id", "id")
