@@ -34,7 +34,7 @@ public class ErrorMiddleware
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
 
-            nats.Publish("th_errors", error.Message);
+            nats.Publish("th_errors", "", error.Message);
             
             var result = JsonSerializer.Serialize(new { message = error.Message });
             await response.WriteAsync(result);

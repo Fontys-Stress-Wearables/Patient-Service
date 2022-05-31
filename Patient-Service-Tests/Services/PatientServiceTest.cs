@@ -23,7 +23,7 @@ public class PatientServiceTest
         _unitOfWorkMock.Setup(x => x.Complete()).Returns(0);
         _unitOfWorkMock.Setup(x => x.Patients.GetByIdAndTenant("tenant", "patient")).Returns(() => null);
 
-        _natsServiceMock.Setup(x => x.Publish("", patient));
+        _natsServiceMock.Setup(x => x.Publish("", patient.Tenant, patient));
     }
 
     [Fact]
