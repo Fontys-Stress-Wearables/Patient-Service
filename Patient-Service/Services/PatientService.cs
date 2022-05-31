@@ -87,16 +87,48 @@ public class PatientService : IPatientService
 
     public async Task<Patient> AddProfileImagePatient(string tenantId, string patientId, IFormFile image)
     {
-        var patient = _unitOfWork.Patients.GetByIdAndTenant(tenantId,patientId);
+        var patient = GetPatient(tenantId, patientId);
+
+        var fileName = $"{Guid.NewGuid()}.jpg";
         
-        if (patient == null)
-        {
-            throw new NotFoundException($"Patient with id '{patientId}' doesn't exist.");
-        }
-        
-        var imageBlobUrl = await _blobStorageService.UploadProfileImage_GetImageUrl(image);
+        var imageBlobUrl = await _blobStorageService.UploadProfileImage_GetImageUrl(image, fileName);
         
         patient.ProfileImageUrl = imageBlobUrl;
+        patient.ProfileImageName = fileName;
+        _unitOfWork.Patients.UpdatePatient(patient);
+        _natsService.Publish("patient-updated", patient);
+
+        _unitOfWork.Complete();
+
+        return patient;
+    }
+    
+    public void RemoveProfileImagePatient(string tenantId, string patientId)
+    {
+        var patient = GetPatient(tenantId, patientId);
+        
+        _blobStorageService.DeleteProfileImage(patient.ProfileImageName);
+        
+        patient.ProfileImageUrl = "";
+        patient.ProfileImageName = "";
+        _unitOfWork.Patients.UpdatePatient(patient);
+        _natsService.Publish("patient-updated", patient);
+
+        _unitOfWork.Complete();
+    }
+    
+    public async Task<Patient> UpdateProfileImagePatient(string tenantId, string patientId, IFormFile image)
+    {
+        var patient = GetPatient(tenantId, patientId);
+        
+        _blobStorageService.DeleteProfileImage(patient.ProfileImageName);
+        
+        var fileName = $"{Guid.NewGuid()}.jpg";
+        
+        var imageBlobUrl = await _blobStorageService.UploadProfileImage_GetImageUrl(image, fileName);
+        
+        patient.ProfileImageUrl = imageBlobUrl;
+        patient.ProfileImageName = image.FileName;
         _unitOfWork.Patients.UpdatePatient(patient);
         _natsService.Publish("patient-updated", patient);
 

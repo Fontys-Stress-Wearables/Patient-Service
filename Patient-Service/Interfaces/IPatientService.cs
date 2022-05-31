@@ -14,4 +14,7 @@ public interface IPatientService
         DateTime? birthdate);
 
     public Task<Patient> AddProfileImagePatient(string tenantId, string patientId, IFormFile image);
+
+    public void RemoveProfileImagePatient(string tenantId, string patientId);
+    public Task<Patient> UpdateProfileImagePatient(string tenantId, string patientId, IFormFile image);
 }

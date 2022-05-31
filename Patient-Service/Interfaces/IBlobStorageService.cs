@@ -2,5 +2,6 @@
 
 public interface IBlobStorageService
 {
-    public Task<string> UploadProfileImage_GetImageUrl(IFormFile imageFile);
+    public Task<string> UploadProfileImage_GetImageUrl(IFormFile imageFile, string fileName);
+    public void DeleteProfileImage(string imageName);
 }

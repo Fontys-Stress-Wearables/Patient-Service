@@ -11,18 +11,18 @@ public class BlobStorageService : IBlobStorageService
     public BlobStorageService(IConfiguration configuration)
     {
         _configuration = configuration;
-        _blobContainerClient = new BlobContainerClient(_configuration.GetConnectionString("blogStorageConnectionString"),
-            _configuration.GetConnectionString("blobImageContainerName"));
+        _blobContainerClient = new BlobContainerClient(_configuration["blogStorageConnectionString"],
+            _configuration["blobImageContainerName"]);
 
     }
 
-    public async Task<string> UploadProfileImage_GetImageUrl(IFormFile imageFile)
+    public async Task<string> UploadProfileImage_GetImageUrl(IFormFile imageFile, string fileName)
     {
         using(var memoryStream = new MemoryStream()) {
             imageFile.CopyTo(memoryStream);
         }
 
-        var blob = _blobContainerClient.GetBlobClient(imageFile.FileName);
+        var blob = _blobContainerClient.GetBlobClient(fileName);
         
         var stream = imageFile.OpenReadStream();
         await blob.UploadAsync(stream);
@@ -30,5 +30,12 @@ public class BlobStorageService : IBlobStorageService
         Console.WriteLine("--> image uploaded: " + imageUrl);
 
         return imageUrl;
+    }
+    
+    public void DeleteProfileImage(string imageName)
+    {
+        var blob = _blobContainerClient.GetBlobClient(imageName);
+        blob.Delete();
+        Console.WriteLine($"{imageName} is deleted!");
     }
 }
