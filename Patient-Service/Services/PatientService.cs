@@ -45,7 +45,7 @@ public class PatientService : IPatientService
         };
 
         _unitOfWork.Patients.Add(patient);
-        _natsService.Publish("patient-created", patient);
+        _natsService.Publish("patient-created",patient.Tenant,patient);
             
         _unitOfWork.Complete();
 
@@ -78,7 +78,7 @@ public class PatientService : IPatientService
         patient.Birthdate = birthdate ?? patient.Birthdate;
 
         _unitOfWork.Patients.UpdatePatient(patient);
-        _natsService.Publish("patient-updated", patient);
+        _natsService.Publish("patient-updated",patient.Tenant,patient);
         
         _unitOfWork.Complete();
         
@@ -96,7 +96,7 @@ public class PatientService : IPatientService
         // patient.ProfileImageUrl = imageBlobUrl;
         // patient.ProfileImageName = fileName;
         _unitOfWork.Patients.UpdatePatient(patient);
-        _natsService.Publish("patient-updated", patient);
+        _natsService.Publish("patient-profileImage-added",patient.Tenant,patient);
 
         _unitOfWork.Complete();
 
@@ -112,7 +112,7 @@ public class PatientService : IPatientService
         patient.ProfileImageUrl = "";
         patient.ProfileImageName = "";
         _unitOfWork.Patients.UpdatePatient(patient);
-        _natsService.Publish("patient-updated", patient);
+        _natsService.Publish("patient-profileImage-removed",patient.Tenant, patient);
 
         _unitOfWork.Complete();
     }
@@ -130,7 +130,7 @@ public class PatientService : IPatientService
         // patient.ProfileImageUrl = imageBlobUrl;
         // patient.ProfileImageName = image.FileName;
         _unitOfWork.Patients.UpdatePatient(patient);
-        _natsService.Publish("patient-updated", patient);
+        _natsService.Publish("patient-profileImage-changed",patient.Tenant, patient);
 
         _unitOfWork.Complete();
 

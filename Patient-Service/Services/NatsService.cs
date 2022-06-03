@@ -28,9 +28,9 @@ public class NatsService : INatsService
         return cf.CreateConnection(opts);
     }
 
-    public void Publish<T>(string target, T data)
+    public void Publish<T>(string target, string tenantId, T data)
     {
-        var message = new NatsMessage<T>{target = target, message = data};
+        var message = new NatsMessage<T>{target = target, tenantId = tenantId, message = data};
         _connection?.Publish(target, Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message)));
     }
 
