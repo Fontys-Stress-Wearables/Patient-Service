@@ -91,10 +91,10 @@ public class PatientService : IPatientService
 
         var fileName = $"{Guid.NewGuid()}.jpg";
         
-        var imageBlobUrl = await _blobStorageService.UploadProfileImage_GetImageUrl(image, fileName);
+        // var imageBlobUrl = await _blobStorageService.UploadProfileImage_GetImageUrl(image, fileName);
         
-        patient.ProfileImageUrl = imageBlobUrl;
-        patient.ProfileImageName = fileName;
+        // patient.ProfileImageUrl = imageBlobUrl;
+        // patient.ProfileImageName = fileName;
         _unitOfWork.Patients.UpdatePatient(patient);
         _natsService.Publish("patient-profileImage-added",patient.Tenant,patient);
 
@@ -107,7 +107,7 @@ public class PatientService : IPatientService
     {
         var patient = GetPatient(tenantId, patientId);
         
-        _blobStorageService.DeleteProfileImage(patient.ProfileImageName);
+        // _blobStorageService.DeleteProfileImage(patient.ProfileImageName);
         
         patient.ProfileImageUrl = "";
         patient.ProfileImageName = "";
@@ -121,14 +121,14 @@ public class PatientService : IPatientService
     {
         var patient = GetPatient(tenantId, patientId);
         
-        _blobStorageService.DeleteProfileImage(patient.ProfileImageName);
+        // _blobStorageService.DeleteProfileImage(patient.ProfileImageName);
         
         var fileName = $"{Guid.NewGuid()}.jpg";
         
-        var imageBlobUrl = await _blobStorageService.UploadProfileImage_GetImageUrl(image, fileName);
+        // var imageBlobUrl = await _blobStorageService.UploadProfileImage_GetImageUrl(image, fileName);
         
-        patient.ProfileImageUrl = imageBlobUrl;
-        patient.ProfileImageName = image.FileName;
+        // patient.ProfileImageUrl = imageBlobUrl;
+        // patient.ProfileImageName = image.FileName;
         _unitOfWork.Patients.UpdatePatient(patient);
         _natsService.Publish("patient-profileImage-changed",patient.Tenant, patient);
 
