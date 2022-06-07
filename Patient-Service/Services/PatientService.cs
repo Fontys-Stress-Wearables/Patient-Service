@@ -46,6 +46,7 @@ public class PatientService : IPatientService
 
         _unitOfWork.Patients.Add(patient);
         _natsService.Publish("patient-created",patient.Tenant,patient);
+        _natsService.Publish("th-logs","", $"Patient created with ID: '{patient.Id}.'");
             
         _unitOfWork.Complete();
 
@@ -84,6 +85,7 @@ public class PatientService : IPatientService
 
         _unitOfWork.Patients.UpdatePatient(patient);
         _natsService.Publish("patient-updated",patient.Tenant,patient);
+        _natsService.Publish("th-logs","", $"Patient updated with ID: '{patient.Id}.'");
         
         _unitOfWork.Complete();
         
@@ -102,6 +104,7 @@ public class PatientService : IPatientService
         // patient.ProfileImageName = fileName;
         _unitOfWork.Patients.UpdatePatient(patient);
         _natsService.Publish("patient-profileImage-added",patient.Tenant,patient);
+        _natsService.Publish("th-logs","", $"Patient with ID of '{patient.Id} added profile image.");
 
         _unitOfWork.Complete();
 
@@ -118,6 +121,7 @@ public class PatientService : IPatientService
         patient.ProfileImageName = "";
         _unitOfWork.Patients.UpdatePatient(patient);
         _natsService.Publish("patient-profileImage-removed",patient.Tenant, patient);
+        _natsService.Publish("th-logs","", $"Patient with ID of '{patient.Id} removed profile image.");
 
         _unitOfWork.Complete();
     }
@@ -136,6 +140,7 @@ public class PatientService : IPatientService
         // patient.ProfileImageName = image.FileName;
         _unitOfWork.Patients.UpdatePatient(patient);
         _natsService.Publish("patient-profileImage-changed",patient.Tenant, patient);
+        _natsService.Publish("th-logs","", $"Patient with ID of '{patient.Id} changed profile image.");
 
         _unitOfWork.Complete();
 
