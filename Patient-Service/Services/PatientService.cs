@@ -73,6 +73,11 @@ public class PatientService : IPatientService
     {
         var patient = GetPatient(tenantId, patientId);
 
+        if (birthdate != null && birthdate > DateTime.Now)
+        {
+            throw new BadRequestException("Birthdate cannot be after the current date.");
+        }
+        
         patient.FirstName = firstName ?? patient.FirstName;
         patient.LastName = lastName ?? patient.LastName;
         patient.Birthdate = birthdate ?? patient.Birthdate;

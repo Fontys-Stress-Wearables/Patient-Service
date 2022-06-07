@@ -26,4 +26,9 @@
       <ProjectReference Include="..\Patient-Service\Patient-Service.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="bin\Debug\net6.0\blue1.jpg" />
+      <None Include="bin\Debug\net6.0\blue.jpg" />
+    </ItemGroup>
+
 </Project>

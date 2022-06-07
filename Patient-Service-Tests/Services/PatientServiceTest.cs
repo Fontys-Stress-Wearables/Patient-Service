@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Patient_Service.Exceptions;
 using Patient_Service.Interfaces;
@@ -23,10 +25,6 @@ public class PatientServiceTest
         
         _unitOfWorkMock.Setup(x => x.Patients.Add(patient)).Returns(() => null);
         _unitOfWorkMock.Setup(x => x.Complete()).Returns(0);
-        _natsServiceMock.Setup(x => x.Publish("", patient));
-        _unitOfWorkMock.Setup(x => x.Patients.GetByIdAndTenant("tenant", "patient")).Returns(() => null);
-
-        _natsServiceMock.Setup(x => x.Publish("", patient.Tenant, patient));
     }
 
     [Fact]
@@ -128,5 +126,80 @@ public class PatientServiceTest
         );
         //Assert
         Assert.Equal("Patient with id 'id' doesn't exist.", exception.Message);
+    }
+    
+    [Fact]
+    public void UpdatePatient_ShouldSucceed()
+    {
+        //Arrange
+        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
+        var patient = new Patient() { Id = "patientId"};
+        _unitOfWorkMock.Setup(x => x.Patients.GetByIdAndTenant("", patient.Id)).Returns(patient);
+        //Act
+        var result = patientService.UpdatePatient("", patient.Id, "firstname", "lastname", Convert.ToDateTime("Dec 12, 1999"));
+        //Assert
+        _unitOfWorkMock.Verify(x => x.Complete());
+        Assert.NotNull(result);
+        Assert.Equal(patient.Id, result.Id);
+    }
+    
+    [Fact]
+    public void UpdatePatientWithDateGreaterThanCurrent_ShouldFail()
+    {
+        //Arrange
+        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
+        var patient = new Patient() { Id = "patientId"};
+        _unitOfWorkMock.Setup(x => x.Patients.GetByIdAndTenant("id", patient.Id)).Returns(patient);
+        //Act
+        var exception = Assert.Throws<BadRequestException>(() => 
+            patientService.UpdatePatient("id", "patientId", "Doe","Bob", Convert.ToDateTime("Dec 12, 9999"))
+        );
+        //Assert
+        Assert.Equal("Birthdate cannot be after the current date.", exception.Message);
+    }
+    
+    [Fact]
+    public async void AddProfileImagePatient_ShouldSucceed()
+    {
+        //Arrange
+        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
+        var patient = new Patient() { Id = "patientId"};
+        _unitOfWorkMock.Setup(x => x.Patients.GetByIdAndTenant("", patient.Id)).Returns(patient);
+        //Act
+        var result = await patientService.AddProfileImagePatient("", patient.Id, 
+            new FormFile(File.Open("blue.jpg", FileMode.Open), 0, 0, "", ""));
+        //Assert
+        _unitOfWorkMock.Verify(x => x.Complete());
+        Assert.NotNull(result);
+        Assert.Equal(patient.Id, result.Id);
+    }
+    
+    [Fact]
+    public void RemoveProfileImagePatient_ShouldSucceed()
+    {
+        //Arrange
+        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
+        var patient = new Patient() { Id = "patientId"};
+        _unitOfWorkMock.Setup(x => x.Patients.GetByIdAndTenant("", patient.Id)).Returns(patient);
+        //Act
+        patientService.RemoveProfileImagePatient("", patient.Id);
+        //Assert
+        _unitOfWorkMock.Verify(x => x.Complete());
+    }
+    
+    [Fact]
+    public async void UpdateProfileImagePatient_ShouldSucceed()
+    {
+        //Arrange
+        IPatientService patientService = new PatientService(_unitOfWorkMock.Object, _natsServiceMock.Object, _blobStorage.Object);
+        var patient = new Patient() { Id = "patientId"};
+        _unitOfWorkMock.Setup(x => x.Patients.GetByIdAndTenant("", patient.Id)).Returns(patient);
+        //Act
+        var result = await patientService.UpdateProfileImagePatient("", patient.Id, 
+            new FormFile(File.Open("blue1.jpg", FileMode.Open), 0, 0, "", ""));
+        //Assert
+        _unitOfWorkMock.Verify(x => x.Complete());
+        Assert.NotNull(result);
+        Assert.Equal(patient.Id, result.Id);
     }
 }
