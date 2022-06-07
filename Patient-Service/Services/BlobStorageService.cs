@@ -7,13 +7,22 @@ public class BlobStorageService : IBlobStorageService
 {
     private readonly IConfiguration _configuration;
     private BlobContainerClient _blobContainerClient;
+    private readonly INatsService _natsService;
     
-    public BlobStorageService(IConfiguration configuration)
+    public BlobStorageService(IConfiguration configuration , INatsService natsService)
     {
-        // _configuration = configuration;
-        // _blobContainerClient = new BlobContainerClient(_configuration.GetConnectionString("blogStorageConnectionString"),
-        //     _configuration.GetConnectionString("blobImageContainerName"));
-
+        _configuration = configuration;
+        _natsService = natsService;
+        try
+        {
+            _blobContainerClient = new BlobContainerClient(_configuration.GetConnectionString("blogStorageConnectionString"),
+                _configuration.GetConnectionString("blobImageContainerName"));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            _natsService.Publish("th-logs","", e.Message);
+        }
     }
 
     public async Task<string> UploadProfileImage_GetImageUrl(IFormFile imageFile, string fileName)
