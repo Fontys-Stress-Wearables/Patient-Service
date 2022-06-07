@@ -7,10 +7,12 @@ public class BlobStorageService : IBlobStorageService
 {
     private readonly IConfiguration _configuration;
     private BlobContainerClient _blobContainerClient;
+    private readonly INatsService _natsService;
     
-    public BlobStorageService(IConfiguration configuration)
+    public BlobStorageService(IConfiguration configuration , INatsService natsService)
     {
         _configuration = configuration;
+        _natsService = natsService;
         try
         {
             _blobContainerClient = new BlobContainerClient(_configuration.GetConnectionString("blogStorageConnectionString"),
@@ -19,6 +21,7 @@ public class BlobStorageService : IBlobStorageService
         catch (Exception e)
         {
             Console.WriteLine(e);
+            _natsService.Publish("th-logs","", e.Message);
         }
     }
 
