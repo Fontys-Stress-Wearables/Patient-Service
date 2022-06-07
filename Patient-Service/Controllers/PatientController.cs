@@ -17,13 +17,15 @@ public class PatientController : ControllerBase
 {
     private readonly IPatientService _patientService;
     private readonly IMapper _mapper;
+    private readonly INatsService _natsService;
 
     public PatientController
     (
-        IPatientService patientService, IMapper mapper)
+        IPatientService patientService, IMapper mapper, INatsService natsService)
     {
         _patientService = patientService;
         _mapper = mapper;
+        _natsService = natsService;
     }
     
     [HttpGet]
@@ -47,7 +49,7 @@ public class PatientController : ControllerBase
     public PatientDTO PostPatient(CreatePatientDTO patient)
     {
         var patientData = _patientService.CreatePatient(HttpContext.User.GetTenantId()!, patient.FirstName, patient.LastName, patient.Birthdate);
-
+        _natsService.Publish("patient-created",patientData);
         return _mapper.Map<PatientDTO>(patientData);
     }
     
@@ -55,7 +57,7 @@ public class PatientController : ControllerBase
     public PatientDTO UpdatePatient(string id, UpdatePatientDto patient)
     {
         var patientData = _patientService.UpdatePatient(HttpContext.User.GetTenantId()!, id, patient.FirstName, patient.LastName, patient.Birthdate);
-
+        _natsService.Publish("patient-updated",patientData);
         return _mapper.Map<PatientDTO>(patientData);
     }
     
