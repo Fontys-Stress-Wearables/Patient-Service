@@ -10,10 +10,16 @@ public class BlobStorageService : IBlobStorageService
     
     public BlobStorageService(IConfiguration configuration)
     {
-        // _configuration = configuration;
-        // _blobContainerClient = new BlobContainerClient(_configuration.GetConnectionString("blogStorageConnectionString"),
-        //     _configuration.GetConnectionString("blobImageContainerName"));
-
+        _configuration = configuration;
+        try
+        {
+            _blobContainerClient = new BlobContainerClient(_configuration.GetConnectionString("blogStorageConnectionString"),
+                _configuration.GetConnectionString("blobImageContainerName"));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 
     public async Task<string> UploadProfileImage_GetImageUrl(IFormFile imageFile, string fileName)
