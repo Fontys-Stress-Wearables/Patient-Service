@@ -9,7 +9,7 @@ using Patient_Service.Interfaces;
 
 namespace Patient_Service.Controllers;
 
-[Authorize]
+[Authorize("p-organization-admin")]
 [ApiController]
 [Produces(MediaTypeNames.Application.Json)]
 [Route("patients")]
