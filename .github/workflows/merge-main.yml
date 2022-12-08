@@ -63,7 +63,7 @@ jobs:
       - name: Download workflow data
         uses: actions/download-artifact@v3
         with:
-          name: patient-artifact
+          name: patient-merge-artifact
           path: /home/runner/work/Patient-Service/Patient-Service/release/
       
       - name: Test
