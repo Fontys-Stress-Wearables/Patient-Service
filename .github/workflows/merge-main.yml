@@ -49,7 +49,7 @@ jobs:
     - name: Persist workflow data as artifact
       uses: actions/upload-artifact@v3
       with:
-        name: patient-artifact
+        name: patient-merge-artifact
         path: /home/runner/work/Patient-Service/Patient-Service/release/
 
   analyse:
