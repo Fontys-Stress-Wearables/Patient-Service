@@ -49,7 +49,7 @@ jobs:
     - name: Persist workflow data as artifact
       uses: actions/upload-artifact@v3
       with:
-        name: patient-merge-artifact
+        name: patient-cicd-artifact
         path: /home/runner/work/Patient-Service/Patient-Service/release/
 
   analyse:
@@ -63,7 +63,7 @@ jobs:
       - name: Download workflow data
         uses: actions/download-artifact@v3
         with:
-          name: patient-merge-artifact
+          name: patient-cicd-artifact
           path: /home/runner/work/Patient-Service/Patient-Service/release/
       
       - name: Test
