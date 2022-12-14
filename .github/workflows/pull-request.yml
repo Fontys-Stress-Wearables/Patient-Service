@@ -45,6 +45,7 @@ jobs:
         path: /home/runner/work/Patient-Service/Patient-Service/release/
   
   codeQL-analyse:
+    needs: [ build ]
     name: Analyze
     runs-on: ubuntu-latest
     permissions:
@@ -86,7 +87,7 @@ jobs:
 
   analyse:
     name: Unit Tests
-    needs: [ build, codeQL-analyse ]
+    needs: [ codeQL-analyse ]
     runs-on: ubuntu-latest
     
     steps:
