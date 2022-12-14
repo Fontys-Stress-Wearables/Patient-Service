@@ -31,13 +31,6 @@ jobs:
     - name: Publish
       run: dotnet publish Patient-Service/Patient-Service.csproj -c Release -o release --nologo
         
-    - name: Lint Code Base
-      uses: github/super-linter@v4
-      env:
-        VALIDATE_ALL_CODEBASE: false
-        DEFAULT_BRANCH: master
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
     - name: Persist workflow data as artifact
       uses: actions/upload-artifact@v3
       with:
