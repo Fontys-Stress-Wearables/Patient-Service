@@ -43,10 +43,27 @@ jobs:
       with:
         name: patient-artifact
         path: /home/runner/work/Patient-Service/Patient-Service/release/
+
+  analyse:
+    name: Unit Tests
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download workflow data
+        uses: actions/download-artifact@v3
+        with:
+          name: patient-artifact
+          path: /home/runner/work/Patient-Service/Patient-Service/release/
+      
+      - name: Test
+        run: dotnet test --no-restore --verbosity normal
+        working-directory: Patient-Service-Tests
   
   codeQL-analyse:
-    needs: [ build ]
-    name: Analyze
+    name: codeQL-Analyse
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -84,24 +101,6 @@ jobs:
       uses: github/codeql-action/analyze@v2
       with:
         category: "/language:${{matrix.language}}"
-
-  analyse:
-    name: Unit Tests
-    needs: [ codeQL-analyse ]
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Download workflow data
-        uses: actions/download-artifact@v3
-        with:
-          name: patient-artifact
-          path: /home/runner/work/Patient-Service/Patient-Service/release/
-      
-      - name: Test
-        run: dotnet test --no-restore --verbosity normal
-        working-directory: Patient-Service-Tests
 
   sonarcloud:
     name: SonarCloud
