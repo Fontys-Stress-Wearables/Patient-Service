@@ -111,7 +111,7 @@ jobs:
           # Shallow clones should be disabled for a better relevancy of analysis          
 
       - name: Cache SonarCloud packages
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~\sonar\cache
           key: ${{ runner.os }}-sonar
@@ -119,7 +119,7 @@ jobs:
 
       - name: Cache SonarCloud scanner
         id: cache-sonar-scanner
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
