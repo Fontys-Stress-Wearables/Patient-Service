@@ -9,7 +9,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "nuget"
+      interval: "weekly"
   # Enable version updates for nuget 
   - package-ecosystem: "nuget" # See documentation for possible values
   # Look for nuget dependency info from the `root` directory
